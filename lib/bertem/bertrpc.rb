@@ -10,7 +10,7 @@ module EventMachine
     #     p(res)
     #   }
     # }
-    
+
     # NOTE: ernie (and all other BERTRPC servers?) closes connections after
     #       responding, so we can't send multiple requests per connection.
     #       Hence, the default for persistent is false.  If you are dealing
@@ -22,7 +22,7 @@ module EventMachine
       include ::BERTRPC::Encodes
 
       attr_accessor :requests
-      
+
       class Request
         attr_accessor :kind, :options
 
@@ -37,15 +37,15 @@ module EventMachine
         end
 
       end
-      
+
       def self.persistent
         @@persistent ||= false
       end
-      
+
       def self.persistent=(b)
         @@persistent = b
       end
-      
+
       def self.connect(host, port, timeout = nil, p = false)
         persistent = p
         c = EM.connect(host, port, self)
@@ -54,9 +54,9 @@ module EventMachine
       end
 
       def post_init
-				@requests = []
+        @requests = []
       end
-      
+
       def persistent
         BERTRPC.persistent
       end
@@ -69,7 +69,7 @@ module EventMachine
         @requests.pop.succeed(@response)
         close_connection unless persistent
       end
-      
+
       def call(options = nil)
         verify_options(options)
         Request.new(self, :call, options)
