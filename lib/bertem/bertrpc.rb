@@ -10,6 +10,13 @@ module EventMachine
     #     p(res)
     #   }
     # }
+    
+    # NOTE: ernie (and all other BERTRPC servers?) closes connections after
+    #       responding, so we can't send multiple requests per connection.
+    #       Hence, the default for persistent is false.  If you are dealing
+    #       with a more sophisticated server that supports more than one
+    #       request per connection, call EM::Protocols::BERTRPC.connect with
+    #       persistent = true and it should Just Work.
 
     class BERTRPC < EventMachine::Connection
       include ::BERTRPC::Encodes
@@ -30,13 +37,28 @@ module EventMachine
         end
 
       end
-
-      def self.connect(host, port, timeout = nil)
-        EM.connect(host, port, self)
+      
+      def self.persistent
+        @@persistent ||= false
+      end
+      
+      def self.persistent=(b)
+        @@persistent = b
+      end
+      
+      def self.connect(host, port, timeout = nil, p = false)
+        persistent = p
+        c = EM.connect(host, port, self)
+        c.pending_connect_timeout = timeout if timeout
+        c
       end
 
       def post_init
 				@requests = []
+      end
+      
+      def persistent
+        BERTRPC.persistent
       end
 
       def receive_data(bert_response)
@@ -45,6 +67,7 @@ module EventMachine
         raise ::BERTRPC::ProtocolError.new(::BERTRPC::ProtocolError::NO_DATA) unless bert_response.length > 0
         @response = decode_bert_response(bert_response)
         @requests.pop.succeed(@response)
+        close_connection unless persistent
       end
       
       def call(options = nil)
