@@ -5,8 +5,8 @@ module EventMachine
     #EM.run{
     #   svc = EM::Protocols::BERTRPC.connect('localhost', 9999)
     #
-    #   svc.call.calc.add(1, 2)
-    #   svc.callback{ |res|
+    #   req = svc.call.calc.add(1, 2)
+    #   req.callback{ |res|
     #     p(res)
     #   }
     # }
@@ -14,6 +14,8 @@ module EventMachine
     class BERTRPC < EventMachine::Connection
       include ::BERTRPC::Encodes
 
+      attr_accessor :requests
+      
       class Request
         attr_accessor :kind, :options
 
@@ -47,11 +49,10 @@ module EventMachine
         @response = decode_bert_response(@response_data)
         @requests.pop.succeed(@response)
       end
-
+      
       def call(options = nil)
         verify_options(options)
-        @requests.unshift(Request.new(self, :call, options))
-				@requests.first
+        Request.new(self, :call, options)
       end
 
       def cast(options = nil)

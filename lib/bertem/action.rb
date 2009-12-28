@@ -8,7 +8,7 @@ module BERTRPC
 
     def execute
       transaction(encode_ruby_request(t[@req.kind, @mod, @fun, @args]))
-      EM::DefaultDeferrable.new
+      @svc.requests.unshift(EM::DefaultDeferrable.new).first
     end
 
     def write(bert)
