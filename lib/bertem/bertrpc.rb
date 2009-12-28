@@ -12,7 +12,6 @@ module EventMachine
     # }
 
     class BERTRPC < EventMachine::Connection
-      include EventMachine::Deferrable
       include ::BERTRPC::Encodes
 
       class Request
@@ -35,30 +34,24 @@ module EventMachine
       end
 
       def post_init
-        super
-        @connected = EM::DefaultDeferrable.new
-      end
-
-      def connection_completed
-        super
-        @connected.succeed
-      end
-
-      def dispatch_response
-        succeed(@response)
+				@response_data = ""
+				@requests = []
       end
 
       def receive_data(bert_response)
-        raise ::BERTRPC::ProtocolError.new(::BERTRPC::ProtocolError::NO_HEADER) unless bert_response.length > 4
-        len = bert_response.slice!(0..3).unpack('N').first # just here to strip the length header
-        raise ::BERTRPC::ProtocolError.new(::BERTRPC::ProtocolError::NO_DATA) unless bert_response.length > 0
-        @response = decode_bert_response(bert_response)
-        dispatch_response
+        @response_data << bert_response
+        
+        raise ::BERTRPC::ProtocolError.new(::BERTRPC::ProtocolError::NO_HEADER) unless @response_data.length > 4
+        len = @response_data.slice!(0..3).unpack('N').first # just here to strip the length header
+        raise ::BERTRPC::ProtocolError.new(::BERTRPC::ProtocolError::NO_DATA) unless @response_data.length > 0
+        @response = decode_bert_response(@response_data)
+        @requests.pop.succeed(@response)
       end
 
       def call(options = nil)
         verify_options(options)
-        Request.new(self, :call, options)
+        @requests.unshift(Request.new(self, :call, options))
+				@requests.first
       end
 
       def cast(options = nil)
