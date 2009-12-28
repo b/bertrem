@@ -11,6 +11,14 @@ Gem::Specification.new do |s|
   s.authors = ["Benjamin Black"]
   s.date = %q{2009-12-27}
   s.email = %q{b@b3k.us}
+  s.files = [
+    "Rakefile",
+     "VERSION",
+     "bertem.gemspec",
+     "lib/bertem.rb",
+     "lib/bertem/action.rb",
+     "lib/bertem/bertrpc.rb"
+  ]
   s.homepage = %q{http://github.com/b/bertem}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]

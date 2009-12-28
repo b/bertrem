@@ -1,15 +1,15 @@
 module BERTRPC
   class Action
-    
+
     undef_method :execute
     undef_method :write
     undef_method :transaction
     undef_method :connect_to
-    
+
     def execute
       transaction(encode_ruby_request(t[@req.kind, @mod, @fun, @args]))
     end
-    
+
     def write(bert)
       @svc.send_data([bert.length].pack("N"))
       @svc.send_data(bert)
@@ -26,6 +26,6 @@ module BERTRPC
 
       write(bert_request)
     end
-    
+
   end
 end
