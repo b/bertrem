@@ -5,8 +5,8 @@ module EventMachine
     #EM.run{
     #   svc = EM::Protocols::BERTRPC.connect('localhost', 9999)
     #
-    #   req = svc.call.calc.add(1, 2)
-    #   req.callback{ |res|
+    #   svc.call.calc.add(1, 2)
+    #   svc.callback{ |res|
     #     p(res)
     #   }
     # }
