@@ -30,7 +30,6 @@ module BERTEM
       m = Mod.new(name)
       self.current_mod = m
       self.mods[name] = m
-      puts "About to call new mod block with current_mod #{self.current_mod}"
       block.call
     end
 
@@ -40,7 +39,6 @@ module BERTEM
     #
     # Returns nothing
     def self.fun(name, block)
-      puts "Adding new fun #{name} from #{self.current_mod}"
       self.current_mod.fun(name, block)
     end
 
@@ -57,7 +55,6 @@ module BERTEM
           self.fun(meth.to_sym, context.method(meth))
         end
       })
-      puts "Finished exposing funs"
       context
     end
 
@@ -108,7 +105,6 @@ module BERTEM
     # Receive data on the connection.
     #
     def receive_data(data)
-      puts "Received data #{data}"
       while data.length > 4 do
         raw = data.slice!(0..3)
         puts "Could not find BERP length header.  Weird, huh?" unless raw
@@ -119,7 +115,7 @@ module BERTEM
         
         unless iruby
           Server.log.info("(#{Process.pid}) No Ruby in this here packet.  On to the next one...")
-          #exit!
+          next
         end
 
         if iruby.size == 4 && iruby[0] == :call
