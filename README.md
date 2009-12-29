@@ -88,7 +88,9 @@ The BERTEM client supports persistent connections, so you can send multiple requ
 	    puts "Got response! -> #{res}"
 	  }
 	}
-
+	# Got response! -> 8
+	# Got response! -> 4
+	
 Alternatively, you can make BERT-RPC calls from Ruby with the [BERTRPC gem](http://github.com/mojombo/bertrpc):
 
     require 'bertrpc'

@@ -118,7 +118,6 @@ module BERTEM
         iruby = BERT.decode(bert)
         
         unless iruby
-          puts "No Ruby in this here packet.  On to the next one..."
           Server.log.info("(#{Process.pid}) No Ruby in this here packet.  On to the next one...")
           #exit!
         end
