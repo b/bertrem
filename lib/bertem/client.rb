@@ -3,21 +3,11 @@ require 'logger'
 require 'eventmachine'
 
 module BERTEM
-  # = Example
-  # EM.run{
-  #   svc = BERTEM::Client.service('localhost', 9999)
-  #
-  #   req = svc.call.calc.add(1, 2)
-  #   req.callback{ |res|
-  #     p(res)
-  #   }
-  # }
-
   # NOTE: ernie (and all other BERTRPC servers?) closes connections after
   #       responding, so we can't send multiple requests per connection.
   #       Hence, the default for persistent is false.  If you are dealing
   #       with a more sophisticated server that supports more than one
-  #       request per connection, call EM::Protocols::BERTRPC.service with
+  #       request per connection, call BERTEM.service with
   #       persistent = true and it should Just Work.
 
   class Client < EventMachine::Connection
@@ -46,8 +36,8 @@ module BERTEM
     
     self.persistent = false
 
-    def self.service(host, port, timeout = nil, p = false)
-      self.persistent = p
+    def self.service(host, port, persistent = false, timeout = nil)
+      self.persistent = persistent
       c = EM.connect(host, port, self)
       c.pending_connect_timeout = timeout if timeout
       c
