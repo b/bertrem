@@ -16,10 +16,8 @@ BERTEM currently supports the following BERT-RPC features:
 Installation
 ------------
 
-	$ git clone git://github.com/b/bertem.git && cd bertem
-	$ rake build
-    $ gem install pkg/bertem-0.0.3.gem
-
+	$ gem install bertem -s http://gemcutter.org
+	
 
 Example Handler
 ---------------
@@ -40,6 +38,7 @@ Example Server
 
 A simple BERTEM server using the Calc module defined above:
 
+	require 'eventmachine'
 	require 'bertem'
 
 	EM.run {
@@ -74,6 +73,7 @@ Using the BERTRPC gem to make calls to BERTEM
 
 The BERTEM client supports persistent connections, so you can send multiple requests over the same service connection and responses will return in the order the requests were sent:
 
+	require 'eventmachine'
 	require 'bertem'
 	
 	EM.run {
