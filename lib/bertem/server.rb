@@ -105,6 +105,9 @@ module BERTEM
     # Receive data on the connection.
     #
     def receive_data(data)
+      # This needs to be much more intelligent (retain a buffer, append new request data
+      # to the buffer, remember the length of the msg it is working with if it is incomplete,
+      # etc.)
       while data.length > 4 do
         raw = data.slice!(0..3)
         puts "Could not find BERP length header.  Weird, huh?" unless raw
