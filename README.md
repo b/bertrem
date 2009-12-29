@@ -60,14 +60,6 @@ Logger::DEBUG will include the response (be careful, doing this can generate
 very large log files).
 
 
-Example BERT-RPC call for above example
----------------------------------------
-
-    -> {call, calc, add, [1, 2]}
-
-    <- {reply, 3}
-
-
 Using the BERTRPC gem to make calls to BERTEM
 ---------------------------------------------
 
