@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "bertem"
-    gem.summary = %Q{BERTEM is a Ruby EventMachine BERT-RPC client library.}
+    gem.summary = %Q{BERTEM is a Ruby EventMachine BERT-RPC client and server library.}
     gem.email = "b@b3k.us"
     gem.homepage = "http://github.com/b/bertem"
     gem.authors = ["Benjamin Black"]

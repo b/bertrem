@@ -1,8 +1,11 @@
+require 'logger'
 require 'bertrpc'
 require 'eventmachine'
 
 require 'bertem/action'
-require 'bertem/bertrpc'
+require 'bertem/mod'
+require 'bertem/client'
+require 'bertem/server'
 
 module BERTEM
   def self.version
