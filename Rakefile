@@ -4,10 +4,10 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "bertem"
-    gem.summary = %Q{BERTEM is a Ruby EventMachine BERT-RPC client and server library.}
+    gem.name = "bertrem"
+    gem.summary = %Q{BERTREM is a Ruby EventMachine BERT-RPC client and server library.}
     gem.email = "b@b3k.us"
-    gem.homepage = "http://github.com/b/bertem"
+    gem.homepage = "http://github.com/b/bertrem"
     gem.authors = ["Benjamin Black"]
     gem.add_dependency('bertrpc', '>= 1.1.2', '< 2.0.0')
     gem.add_dependency('eventmachine')

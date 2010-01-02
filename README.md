@@ -1,13 +1,13 @@
-BERTEM
+BERTREM
 ======
 
 By Benjamin Black (b@b3k.us)
 
-BERTEM is a BERT-RPC client and server implementation that uses an EventMachine server to accept incoming connections, and then delegates the request to loadable Ruby handlers.  BERTEM is derived from [Ernie](http://github.com/mojombo/ernie), by Tom Preston-Warner.
+BERTREM is a BERT-RPC client and server implementation that uses an EventMachine server to accept incoming connections, and then delegates the request to loadable Ruby handlers.  BERTREM is derived from [Ernie](http://github.com/mojombo/ernie), by Tom Preston-Warner.
 
 See the full BERT-RPC specification at [bert-rpc.org](http://bert-rpc.org).
 
-BERTEM currently supports the following BERT-RPC features:
+BERTREM currently supports the following BERT-RPC features:
 
 * `call` requests
 * `cast` requests
@@ -16,15 +16,15 @@ BERTEM currently supports the following BERT-RPC features:
 Installation
 ------------
 
-	$ gem install bertem -s http://gemcutter.org
+	$ gem install bertrem -s http://gemcutter.org
 	
 
 Example Handler
 ---------------
 
-A simple Ruby module for use in a BERTEM server:
+A simple Ruby module for use in a BERTREM server:
 
-    require 'bertem'
+    require 'bertrem'
     
     module Calc
       def add(a, b)
@@ -36,14 +36,14 @@ A simple Ruby module for use in a BERTEM server:
 Example Server
 --------------
 
-A simple BERTEM server using the Calc module defined above:
+A simple BERTREM server using the Calc module defined above:
 
 	require 'eventmachine'
-	require 'bertem'
+	require 'bertrem'
 
 	EM.run {
-	  BERTEM::Server.expose(:calc, Calc)
-	  svc = BERTEM::Server.start('localhost', 9999)
+	  BERTREM::Server.expose(:calc, Calc)
+	  svc = BERTREM::Server.start('localhost', 9999)
 	}
 	
 	
@@ -52,7 +52,7 @@ Logging
 
 You can have logging sent to a file by adding these lines to your handler:
 
-    logfile('/var/log/bertem.log')
+    logfile('/var/log/bertrem.log')
     loglevel(Logger::INFO)
 
 This will log startup info, requests, and error messages to the log. Choosing
@@ -60,16 +60,16 @@ Logger::DEBUG will include the response (be careful, doing this can generate
 very large log files).
 
 
-Using the BERTRPC gem to make calls to BERTEM
----------------------------------------------
+Using the BERTRPC gem to make calls to BERTREM
+---------------------------------------------__
 
-The BERTEM client supports persistent connections, so you can send multiple requests over the same service connection and responses will return in the order the requests were sent:
+The BERTREM client supports persistent connections, so you can send multiple requests over the same service connection and responses will return in the order the requests were sent:
 
 	require 'eventmachine'
-	require 'bertem'
+	require 'bertrem'
 	
 	EM.run {
-	  client = BERTEM::Client.service('localhost', 9999, true)
+	  client = BERTREM::Client.service('localhost', 9999, true)
 	  rpc = client.call.calc.add(6, 2)
 	  rpc.callback { |res|
 	    puts "Got response! -> #{res}"
@@ -95,9 +95,9 @@ Alternatively, you can make BERT-RPC calls from Ruby with the [BERTRPC gem](http
 Contribute
 ----------
 
-If you'd like to hack on BERTEM, start by forking my repo on GitHub:
+If you'd like to hack on BERTREM, start by forking my repo on GitHub:
 
-    http://github.com/b/bertem
+    http://github.com/b/bertrem
 
 To get all of the dependencies, install the gem first
 

@@ -47,6 +47,11 @@ module BERTEM
       @requests = []
     end
 
+    def unbind
+			super
+			(@requests || []).each {|r| r.fail}
+    end
+    
     def persistent
       Client.persistent
     end
@@ -56,11 +61,16 @@ module BERTEM
       # to the buffer, remember the length of the msg it is working with if it is incomplete,
       # etc.)
       while bert_response.length > 4 do
-        raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER) unless bert_response.length > 4
-        len = bert_response.slice!(0..3).unpack('N').first # just here to strip the length header
-        raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless bert_response.length > 0
+        begin
+          raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER) unless bert_response.length > 4
+          len = bert_response.slice!(0..3).unpack('N').first # just here to strip the length header
+          raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless bert_response.length > 0
+        rescue Exception => e
+          log "Bad BERT message: #{e.message}\n#{e.backtrace.inspect}\n"          
+        end
+        
         bert = bert_response.slice!(0..(len - 1))
-        @requests.pop.succeed(decode_bert_response(bert))
+        @requests.pop.succeed(decode_bert_response(bert))  
         unless persistent
           close_connection
           break

@@ -2,7 +2,7 @@ require 'bert'
 require 'logger'
 require 'eventmachine'
 
-module BERTEM
+module BERTREM
   class Server < EventMachine::Connection
     include BERTRPC::Encodes
     
@@ -73,17 +73,17 @@ module BERTEM
     def self.loglevel(level)
       self.log.level = level
     end
-
+    
     # Dispatch the request to the proper mod:fun.
     #   +mod+ is the module Symbol
     #   +fun+ is the function Symbol
     #   +args+ is the Array of arguments
     #
     # Returns the Ruby object response
-    def dispatch(mod, fun, args)
-      Server.mods[mod] || raise(ServerError.new("No such module '#{mod}'"))
-      Server.mods[mod].funs[fun] || raise(ServerError.new("No such function '#{mod}:#{fun}'"))
-      Server.mods[mod].funs[fun].call(*args)
+    def self.dispatch(mod, fun, args)
+      mods[mod] || raise(ServerError.new("No such module '#{mod}'"))
+      mods[mod].funs[fun] || raise(ServerError.new("No such function '#{mod}:#{fun}'"))
+      mods[mod].funs[fun].call(*args)
     end
 
     # Write the given Ruby object to the wire as a BERP.
@@ -125,7 +125,7 @@ module BERTEM
           mod, fun, args = iruby[1..3]
           Server.log.info("-> " + iruby.inspect)
           begin
-            res = dispatch(mod, fun, args)
+            res = Server.dispatch(mod, fun, args)
             oruby = t[:reply, res]
             Server.log.debug("<- " + oruby.inspect)
             write_berp(oruby)
@@ -144,7 +144,7 @@ module BERTEM
           mod, fun, args = iruby[1..3]
           Server.log.info("-> " + [:cast, mod, fun, args].inspect)
           begin
-            dispatch(mod, fun, args)
+            Server.dispatch(mod, fun, args)
           rescue Object => e
             # ignore
           end
@@ -161,4 +161,4 @@ module BERTEM
     
 end
 
-class BERTEM::ServerError < StandardError; end
+class BERTREM::ServerError < StandardError; end

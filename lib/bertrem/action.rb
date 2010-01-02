@@ -1,4 +1,5 @@
 require 'eventmachine'
+require 'bertrpc'
 
 module BERTRPC
   class Action

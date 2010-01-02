@@ -1,4 +1,4 @@
-module BERTEM
+module BERTREM
   class Mod
     
     attr_accessor :name, :funs

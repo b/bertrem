@@ -2,12 +2,12 @@ require 'logger'
 require 'bertrpc'
 require 'eventmachine'
 
-require 'bertem/action'
-require 'bertem/mod'
-require 'bertem/client'
-require 'bertem/server'
+require 'bertrem/action'
+require 'bertrem/mod'
+require 'bertrem/client'
+require 'bertrem/server'
 
-module BERTEM
+module BERTREM
   def self.version
     File.read(File.join(File.dirname(__FILE__), *%w[.. VERSION])).chomp
   rescue
