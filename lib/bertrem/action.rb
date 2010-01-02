@@ -4,10 +4,9 @@ require 'bertrpc'
 module BERTRPC
   class Action
 
-    undef_method :execute
-    undef_method :write
-    undef_method :transaction
-    undef_method :connect_to
+    [:execute, :write, :transaction, :connect_to].each do |m|
+      remove_method m if method_defined?(m)
+    end
 
     def execute
       transaction(encode_ruby_request(t[@req.kind, @mod, @fun, @args]))
