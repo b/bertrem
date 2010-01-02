@@ -4,12 +4,12 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{bertem}
+  s.name = %q{bertrem}
   s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Benjamin Black"]
-  s.date = %q{2009-12-30}
+  s.date = %q{2010-01-01}
   s.email = %q{b@b3k.us}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -21,17 +21,17 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "bertem.gemspec",
-     "lib/bertem.rb",
-     "lib/bertem/action.rb",
-     "lib/bertem/client.rb",
-     "lib/bertem/mod.rb",
-     "lib/bertem/server.rb"
+     "lib/bertrem.rb",
+     "lib/bertrem/action.rb",
+     "lib/bertrem/client.rb",
+     "lib/bertrem/mod.rb",
+     "lib/bertrem/server.rb"
   ]
-  s.homepage = %q{http://github.com/b/bertem}
+  s.homepage = %q{http://github.com/b/bertrem}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{BERTEM is a Ruby EventMachine BERT-RPC client and server library.}
+  s.summary = %q{BERTREM is a Ruby EventMachine BERT-RPC client and server library.}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
