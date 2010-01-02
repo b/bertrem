@@ -79,11 +79,13 @@ module BERTREM
     end
 
     def call(options = nil)
+      raise BERTREM::ConnectionError.new() if error?
       verify_options(options)
       Request.new(self, :call, options)
     end
 
     def cast(options = nil)
+      raise BERTREM::ConnectionError.new() if error?
       verify_options(options)
       Request.new(self, :cast, options)
     end
@@ -103,3 +105,5 @@ module BERTREM
   end
 
 end
+
+class BERTREM::ConnectionError < StandardError ; end
