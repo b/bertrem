@@ -2,12 +2,12 @@ require 'bertrpc'
 require 'logger'
 require 'eventmachine'
 
-module BERTEM
+module BERTREM
   # NOTE: ernie (and all other BERTRPC servers?) closes connections after
   #       responding, so we can't send multiple requests per connection.
   #       Hence, the default for persistent is false.  If you are dealing
   #       with a more sophisticated server that supports more than one
-  #       request per connection, call BERTEM.service with
+  #       request per connection, call BERTREM.service with
   #       persistent = true and it should Just Work.
 
   class Client < EventMachine::Connection
