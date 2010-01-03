@@ -98,22 +98,19 @@ module BERTREM
     end
     
     def post_init
+      @receive_buf = ""
       Server.log.info("(#{Process.pid}) Starting")
-      Server.log.debug(Server.mods.inspect)  
+      Server.log.debug(Server.mods.inspect) 
     end
     
     # Receive data on the connection.
     #
-    def receive_data(data)
-      # This needs to be much more intelligent (retain a buffer, append new request data
-      # to the buffer, remember the length of the msg it is working with if it is incomplete,
-      # etc.)
-      while data.length > 4 do
-        raw = data.slice!(0..3)
-        puts "Could not find BERP length header.  Weird, huh?" unless raw
-        packet_size = raw.unpack('N').first
-        puts "Could not understand BERP packet length.  What gives?" unless packet_size
-        bert = data.slice!(0..(packet_size - 1))
+    def receive_data(bert_request)
+      @receive_buf << bert_request
+      while @receive_buf.length > 4 do
+        len = @receive_buf.slice!(0..3).unpack('N').first
+        puts "Could not understand BERP packet length.  What gives?" unless len
+        bert = @receive_buf.slice!(0..(len - 1))
         iruby = BERT.decode(bert)
         
         unless iruby
