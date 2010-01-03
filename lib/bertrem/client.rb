@@ -43,13 +43,13 @@ module BERTREM
     end
 
     def post_init
+      @receive_buf = ""; @receive_len = 0; @more = false
       @requests = []
-      @receive_buf = ""
     end
 
     def unbind
       super
-      @receive_buf = ""
+      @receive_buf = ""; @receive_len = 0; @more = false
       (@requests || []).each {|r| r.fail}
       raise BERTREM::ConnectionError.new("Connection to server lost!") if error?
     end
@@ -60,20 +60,34 @@ module BERTREM
 
     def receive_data(bert_response)
       @receive_buf << bert_response
-      while @receive_buf.length > 4 do
-        begin
-          raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER) unless @receive_buf.length > 4
-          len = @receive_buf.slice!(0..3).unpack('N').first
-          raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless @receive_buf.length > 0
-        rescue Exception => e
-          log "Bad BERT message: #{e.message}"          
+
+      while @receive_buf.length > 0
+        unless @more
+          begin
+            if @receive_buf.length > 4
+              @receive_len = @receive_buf.slice!(0..3).unpack('N').first if @receive_len == 0
+              raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless @receive_buf.length > 0
+            else
+              raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER)
+            end
+          rescue Exception => e
+            log "Bad BERT message: #{e.message}"
+            return       
+          end
         end
 
-        bert = @receive_buf.slice!(0..(len - 1))
-        @requests.pop.succeed(decode_bert_response(bert))  
-        break unless persistent
+        if @receive_buf.length >= @receive_len
+          bert = @receive_buf.slice!(0..(@receive_len - 1))
+          @receive_len = 0; @more = false
+          @requests.pop.succeed(decode_bert_response(bert))
+          break unless persistent
+        else
+          @more = true
+          break
+        end
       end
-      close_connection unless persistent
+
+      close_connection unless (persistent || @more)
     end
 
     def call(options = nil)

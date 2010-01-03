@@ -5,22 +5,22 @@ require 'eventmachine'
 module BERTREM
   class Server < EventMachine::Connection
     include BERTRPC::Encodes
-    
+
     # This class derived from Ernie/ernie.rb
-    
+
     class << self
       attr_accessor :mods, :current_mod, :log
     end
-    
+
     self.mods = {}
     self.current_mod = nil
     self.log = Logger.new(STDOUT)
     self.log.level = Logger::INFO
-    
+
     def self.start(host, port)
       EM.start_server(host, port, self)
     end
-    
+
     # Record a module.
     #   +name+ is the module Symbol
     #   +block+ is the Block containing function definitions
@@ -73,7 +73,7 @@ module BERTREM
     def self.loglevel(level)
       self.log.level = level
     end
-    
+
     # Dispatch the request to the proper mod:fun.
     #   +mod+ is the module Symbol
     #   +fun+ is the function Symbol
@@ -96,66 +96,85 @@ module BERTREM
       send_data([data.length].pack("N"))
       send_data(data)
     end
-    
+
     def post_init
-      @receive_buf = ""
+      @receive_buf = ""; @receive_len = 0; @more = false
       Server.log.info("(#{Process.pid}) Starting")
       Server.log.debug(Server.mods.inspect) 
     end
-    
+
     # Receive data on the connection.
     #
     def receive_data(bert_request)
       @receive_buf << bert_request
-      while @receive_buf.length > 4 do
-        len = @receive_buf.slice!(0..3).unpack('N').first
-        puts "Could not understand BERP packet length.  What gives?" unless len
-        bert = @receive_buf.slice!(0..(len - 1))
-        iruby = BERT.decode(bert)
-        
-        unless iruby
-          Server.log.info("(#{Process.pid}) No Ruby in this here packet.  On to the next one...")
-          next
+
+      while @receive_buf.length > 0 do
+        unless @more
+          begin
+            if @receive_buf.length > 4
+              @receive_len = @receive_buf.slice!(0..3).unpack('N').first if @receive_len == 0
+              raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless @receive_buf.length > 0
+            else
+              raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER)
+            end
+          rescue Exception => e
+            log "Bad BERT message: #{e.message}"
+            return       
+          end
         end
 
-        if iruby.size == 4 && iruby[0] == :call
-          mod, fun, args = iruby[1..3]
-          Server.log.info("-> " + iruby.inspect)
-          begin
-            res = Server.dispatch(mod, fun, args)
-            oruby = t[:reply, res]
-            Server.log.debug("<- " + oruby.inspect)
-            write_berp(oruby)
-          rescue ServerError => e
-            oruby = t[:error, t[:server, 0, e.class.to_s, e.message, e.backtrace]]
+        if @receive_buf.length >= @receive_len
+          bert = @receive_buf.slice!(0..(@receive_len - 1))     
+          @receive_len = 0; @more = false   
+          iruby = BERT.decode(bert)
+
+          unless iruby
+            Server.log.info("(#{Process.pid}) No Ruby in this here packet.  On to the next one...")
+            next
+          end
+
+          if iruby.size == 4 && iruby[0] == :call
+            mod, fun, args = iruby[1..3]
+            Server.log.info("-> " + iruby.inspect)
+            begin
+              res = Server.dispatch(mod, fun, args)
+              oruby = t[:reply, res]
+              Server.log.debug("<- " + oruby.inspect)
+              write_berp(oruby)
+            rescue ServerError => e
+              oruby = t[:error, t[:server, 0, e.class.to_s, e.message, e.backtrace]]
+              Server.log.error("<- " + oruby.inspect)
+              Server.log.error(e.backtrace.join("\n"))
+              write_berp(oruby)
+            rescue Object => e
+              oruby = t[:error, t[:user, 0, e.class.to_s, e.message, e.backtrace]]
+              Server.log.error("<- " + oruby.inspect)
+              Server.log.error(e.backtrace.join("\n"))
+              write_berp(oruby)
+            end
+          elsif iruby.size == 4 && iruby[0] == :cast
+            mod, fun, args = iruby[1..3]
+            Server.log.info("-> " + [:cast, mod, fun, args].inspect)
+            begin
+              Server.dispatch(mod, fun, args)
+            rescue Object => e
+              # ignore
+            end
+            write_berp(t[:noreply])
+          else
+            Server.log.error("-> " + iruby.inspect)
+            oruby = t[:error, t[:server, 0, "Invalid request: #{iruby.inspect}"]]
             Server.log.error("<- " + oruby.inspect)
-            Server.log.error(e.backtrace.join("\n"))
-            write_berp(oruby)
-          rescue Object => e
-            oruby = t[:error, t[:user, 0, e.class.to_s, e.message, e.backtrace]]
-            Server.log.error("<- " + oruby.inspect)
-            Server.log.error(e.backtrace.join("\n"))
             write_berp(oruby)
           end
-        elsif iruby.size == 4 && iruby[0] == :cast
-          mod, fun, args = iruby[1..3]
-          Server.log.info("-> " + [:cast, mod, fun, args].inspect)
-          begin
-            Server.dispatch(mod, fun, args)
-          rescue Object => e
-            # ignore
-          end
-          write_berp(t[:noreply])
         else
-          Server.log.error("-> " + iruby.inspect)
-          oruby = t[:error, t[:server, 0, "Invalid request: #{iruby.inspect}"]]
-          Server.log.error("<- " + oruby.inspect)
-          write_berp(oruby)
+          @more = true
+          break
         end
       end
     end
   end
-    
+
 end
 
 class BERTREM::ServerError < StandardError; end
