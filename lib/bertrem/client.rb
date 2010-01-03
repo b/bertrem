@@ -33,7 +33,7 @@ module BERTREM
     class << self
       attr_accessor :persistent
     end
-    
+
     self.persistent = false
 
     def self.service(host, port, persistent = false, timeout = nil)
@@ -48,11 +48,11 @@ module BERTREM
     end
 
     def unbind
-			super
-			(@requests || []).each {|r| r.fail}
-			raise BERTREM::ConnectionError.new("Connection to server lost!") if error?
+      super
+      (@requests || []).each {|r| r.fail}
+      raise BERTREM::ConnectionError.new("Connection to server lost!") if error?
     end
-    
+
     def persistent
       Client.persistent
     end
@@ -69,7 +69,7 @@ module BERTREM
         rescue Exception => e
           log "Bad BERT message: #{e.message}"          
         end
-        
+
         bert = bert_response.slice!(0..(len - 1))
         @requests.pop.succeed(decode_bert_response(bert))  
         unless persistent
