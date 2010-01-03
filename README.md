@@ -17,7 +17,7 @@ Installation
 ------------
 
 	$ gem install bertrem -s http://gemcutter.org
-	
+
 
 Example Handler
 ---------------
@@ -45,8 +45,8 @@ A simple BERTREM server using the Calc module defined above:
 	  BERTREM::Server.expose(:calc, Calc)
 	  svc = BERTREM::Server.start('localhost', 9999)
 	}
-	
-	
+
+
 Logging
 -------
 
@@ -61,7 +61,7 @@ very large log files).
 
 
 Using the BERTRPC gem to make calls to BERTREM
----------------------------------------------__
+----------------------------------------------
 
 The BERTREM client supports persistent connections, so you can send multiple requests over the same service connection and responses will return in the order the requests were sent:
 
