@@ -100,7 +100,7 @@ module BERTREM
     def post_init
       @receive_buf = ""; @receive_len = 0; @more = false
       Server.log.info("(#{Process.pid}) Starting")
-      Server.log.debug(Server.mods.inspect) 
+      Server.log.debug(Server.mods.inspect)
     end
 
     # Receive data on the connection.
