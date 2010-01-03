@@ -50,6 +50,7 @@ module BERTREM
     def unbind
 			super
 			(@requests || []).each {|r| r.fail}
+			raise BERTREM::ConnectionError.new("Connection to server lost!") if error?
     end
     
     def persistent
@@ -66,7 +67,7 @@ module BERTREM
           len = bert_response.slice!(0..3).unpack('N').first # just here to strip the length header
           raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_DATA) unless bert_response.length > 0
         rescue Exception => e
-          log "Bad BERT message: #{e.message}\n#{e.backtrace.inspect}\n"          
+          log "Bad BERT message: #{e.message}"          
         end
         
         bert = bert_response.slice!(0..(len - 1))
@@ -79,13 +80,11 @@ module BERTREM
     end
 
     def call(options = nil)
-      raise BERTREM::ConnectionError.new() if error?
       verify_options(options)
       Request.new(self, :call, options)
     end
 
     def cast(options = nil)
-      raise BERTREM::ConnectionError.new() if error?
       verify_options(options)
       Request.new(self, :cast, options)
     end
