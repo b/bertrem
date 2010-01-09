@@ -20,5 +20,5 @@ rescue LoadError
 end
 
 task :console do
-  exec('irb -Ilib -rbertrpc')
+  exec('irb -Ilib -rbertrem')
 end

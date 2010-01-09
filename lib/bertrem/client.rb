@@ -72,7 +72,7 @@ module BERTREM
             end
           rescue Exception => e
             log "Bad BERT message: #{e.message}"
-            return       
+            next       
           end
         end
 

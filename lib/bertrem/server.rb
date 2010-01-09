@@ -99,6 +99,7 @@ module BERTREM
 
     def post_init
       @receive_buf = ""; @receive_len = 0; @more = false
+      #start_tls(:private_key_file => '/tmp/server.key', :cert_chain_file => '/tmp/server.crt', :verify_peer => false)
       Server.log.info("(#{Process.pid}) Starting")
       Server.log.debug(Server.mods.inspect)
     end
@@ -119,7 +120,7 @@ module BERTREM
             end
           rescue Exception => e
             log "Bad BERT message: #{e.message}"
-            return       
+            next       
           end
         end
 
@@ -135,7 +136,7 @@ module BERTREM
 
           if iruby.size == 4 && iruby[0] == :call
             mod, fun, args = iruby[1..3]
-            Server.log.info("-> " + iruby.inspect)
+            Server.log.debug("-> " + iruby.inspect)
             begin
               res = Server.dispatch(mod, fun, args)
               oruby = t[:reply, res]
@@ -154,7 +155,7 @@ module BERTREM
             end
           elsif iruby.size == 4 && iruby[0] == :cast
             mod, fun, args = iruby[1..3]
-            Server.log.info("-> " + [:cast, mod, fun, args].inspect)
+            Server.log.debug("-> " + [:cast, mod, fun, args].inspect)
             begin
               Server.dispatch(mod, fun, args)
             rescue Object => e
