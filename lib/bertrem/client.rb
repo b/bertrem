@@ -30,11 +30,12 @@ module BERTREM
     end
 
     class << self
-      attr_accessor :persistent
+      attr_accessor :persistent, :err_callback
     end
 
     self.persistent = false
-
+    self.err_callback = Proc.new {|msg| raise BERTREM::ConnectionError.new(msg)}
+    
     def self.service(host, port, persistent = false, timeout = nil)
       self.persistent = persistent
       c = EM.connect(host, port, self)
@@ -51,7 +52,7 @@ module BERTREM
       super
       @receive_buf = ""; @receive_len = 0; @more = false
       (@requests || []).each {|r| r.fail}
-      raise BERTREM::ConnectionError.new("Connection to server lost!") if error?
+      Client.err_callback.call("Connection to server lost!") if error?
     end
 
     def persistent
