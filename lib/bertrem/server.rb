@@ -104,6 +104,11 @@ module BERTREM
       Server.log.debug(Server.mods.inspect)
     end
 
+    def unbind
+      super
+      @receive_buf = ""; @receive_len = 0; @more = false
+    end
+    
     # Receive data on the connection.
     #
     def receive_data(bert_request)
@@ -119,7 +124,7 @@ module BERTREM
               raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER)
             end
           rescue Exception => e
-            log "Bad BERT message: #{e.message}"
+            Server.log.debug "Bad BERT message: #{e.message}"
             next       
           end
         end
