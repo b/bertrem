@@ -119,7 +119,7 @@ module BERTREM
               raise BERTRPC::ProtocolError.new(BERTRPC::ProtocolError::NO_HEADER)
             end
           rescue Exception => e
-            log "Bad BERT message: #{e.message}"
+            Server.log.error("Bad BERT message: #{e.message}")
             next       
           end
         end
