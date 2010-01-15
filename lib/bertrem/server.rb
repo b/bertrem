@@ -104,6 +104,11 @@ module BERTREM
       Server.log.debug(Server.mods.inspect)
     end
 
+    def unbind
+      super
+      @receive_buf = ""; @receive_len = 0; @more = false
+    end
+    
     # Receive data on the connection.
     #
     def receive_data(bert_request)
